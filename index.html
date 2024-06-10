@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/style.css">
+    <title>Phaser - Template</title>
+</head>
+
+<body>
+    <div id="app">
+        <div id="game-container"></div>
+    </div>
+    <script type="module" src="src/main.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+      
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const messages = document.getElementById('messages');
+        var id_client = 0;
+      
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          if (input.value) {
+            socket.timeout(1000).emit('chat message', id_client + " " + input.value);
+            input.value = '';
+          }
+        });
+      
+        socket.on('chat message', (msg) => {
+          const item = document.createElement('li');
+          item.textContent = msg;
+          messages.appendChild(item);
+          window.scrollTo(0, document.body.scrollHeight);
+        });
+  
+        socket.timeout(5000).emit('request', 'Demande de numéro client', (err, response) => {
+          if (err) {
+            console.error("Erreur ");
+            console.log(err);
+          } else {
+            console.log('connecté au serveur');
+            console.log(response.status);
+            console.log(response.id_client);
+            id_client = response.id_client;
+          }
+        });
+      </script>
+</body>
+</html>
